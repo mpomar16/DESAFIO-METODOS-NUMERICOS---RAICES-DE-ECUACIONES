@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Metodos de Raices</title>
+  <script src="https://cdn.jsdelivr.net/npm/mathjs@11.8.0/lib/browser/math.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #1f2933 0, #020617 55%, #000000 100%);
+      color: #e5e7eb;
+    }
+    .page {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 24px 16px 40px;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 8px;
+      font-size: 1.9rem;
+      letter-spacing: 0.03em;
+    }
+    .subtitle {
+      text-align: center;
+      margin-bottom: 24px;
+      color: #9ca3af;
+      font-size: 0.95rem;
+    }
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.2fr);
+      gap: 20px;
+    }
+    .card {
+      background: rgba(15, 23, 42, 0.9);
+      border-radius: 14px;
+      padding: 16px 18px 18px;
+      box-shadow: 0 18px 35px rgba(0, 0, 0, 0.45);
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      backdrop-filter: blur(10px);
+    }
+    .card h2 {
+      margin: 0 0 10px;
+      font-size: 1.2rem;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+      font-size: 0.9rem;
+      color: #cbd5f5;
+    }
+    input, select {
+      margin-top: 4px;
+      padding: 7px 9px;
+      border-radius: 8px;
+      border: 1px solid #4b5563;
+      width: 100%;
+      background: #020617;
+      color: #e5e7eb;
+      font-size: 0.9rem;
+    }
+    input:focus, select:focus {
+      outline: none;
+      border-color: #22c55e;
+      box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.5);
+    }
+    .row {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .btn-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+    }
+    button {
+      flex: 1;
+      padding: 9px 10px;
+      border-radius: 999px;
+      border: none;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      color: #ffffff;
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      box-shadow: 0 10px 25px rgba(22, 163, 74, 0.45);
+      transition: transform 0.08s ease, box-shadow 0.08s ease, filter 0.12s ease;
+    }
+    button:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.04);
+      box-shadow: 0 15px 30px rgba(15, 118, 110, 0.55);
+    }
+    button:active {
+      transform: translateY(0px) scale(0.99);
+      box-shadow: 0 8px 18px rgba(15, 23, 42, 0.9);
+    }
+    .helper {
+      font-size: 0.8rem;
+      color: #9ca3af;
+      margin-top: 6px;
+    }
+    #result {
+      font-size: 0.86rem;
+      color: #e5e7eb;
+      margin-bottom: 6px;
+    }
+    #tableContainer {
+      max-height: 320px;
+      overflow: auto;
+      margin-top: 6px;
+      border-radius: 10px;
+      border: 1px solid rgba(55, 65, 81, 0.8);
+      background: rgba(15, 23, 42, 0.65);
+      padding: 6px 8px;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      font-size: 0.78rem;
+      color: #e5e7eb;
+      margin-top: 4px;
+      margin-bottom: 10px;
+    }
+    th, td {
+      border-bottom: 1px solid rgba(55, 65, 81, 0.8);
+      padding: 4px 6px;
+      text-align: right;
+      white-space: nowrap;
+    }
+    th {
+      background: #111827;
+      font-weight: 600;
+    }
+    tr:nth-child(even) td {
+      background: rgba(15, 23, 42, 0.4);
+    }
+    .footer-note {
+      margin-top: 14px;
+      font-size: 0.8rem;
+      color: #9ca3af;
+    }
+    @media (max-width: 880px) {
+      .layout {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+    #rootSummary {
+      margin-bottom: 10px;
+    }
+    .root-summary-header {
+      font-size: 0.9rem;
+      color: #facc15;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 4px;
+    }
+    .root-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 4px;
+    }
+    .root-chip {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 6px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: radial-gradient(circle at top left, #f97316, #facc15);
+      color: #111827;
+      font-weight: 700;
+      box-shadow: 0 0 18px rgba(250, 204, 21, 0.85);
+      font-size: 0.86rem;
+    }
+    .root-chip-value {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+    .root-chip-fx {
+      font-weight: 500;
+      font-size: 0.72rem;
+      opacity: 0.9;
+    }
+    .root-chip-label {
+      font-size: 0.74rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #0f172a;
+    }
+    .root-table-title {
+      margin-top: 4px;
+      font-size: 0.9rem;
+      color: #a5b4fc;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <h1>Metodos de Biseccion, Newton y Secante</h1>
+    <div class="subtitle">
+      Ingresa una funcion f(x), un intervalo de busqueda y un metodo. Si hay varias raices, se generan tablas para cada una.
+    </div>
+
+    <div class="layout">
+      <div class="card">
+        <h2>Entrada de datos</h2>
+
+        <label for="fnInput">
+          Funcion f(x)
+        </label>
+        <input id="fnInput" type="text" value="x^3 - exp(0.8*x) - 20">
+
+        <label for="methodSelect">Metodo numerico</label>
+        <select id="methodSelect">
+          <option value="bisection">Biseccion</option>
+          <option value="newton">Newton</option>
+          <option value="secant">Secante</option>
+        </select>
+
+        <div class="helper">
+          Se buscan raices en el intervalo [x_min, x_max] usando barrido y luego el metodo elegido.
+        </div>
+
+        <div class="row">
+          <div>
+            <label for="xminInput">x minimo de busqueda</label>
+            <input id="xminInput" type="number" value="0">
+          </div>
+          <div>
+            <label for="xmaxInput">x maximo de busqueda</label>
+            <input id="xmaxInput" type="number" value="8">
+          </div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label for="tolInput">Tolerancia</label>
+            <input id="tolInput" type="number" value="0.0001" step="0.0001">
+          </div>
+          <div>
+            <label for="maxIterInput">Iteraciones maximas</label>
+            <input id="maxIterInput" type="number" value="50">
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button id="runBtn">Buscar raices y tablas</button>
+        </div>
+
+        <div class="footer-note">
+          Usa sin(x), cos(x), exp(x), log(x), sqrt(x), etc. La variable independiente debe llamarse x.
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Raices aproximadas</h2>
+        <div id="rootSummary" class="helper">
+          Aun no se ha ejecutado ningun metodo.
+        </div>
+
+        <h2 style="margin-top:10px;">Tablas de iteraciones</h2>
+        <div id="result"></div>
+        <div id="tableContainer"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function buildFunction(exprText) {
+      const node = math.parse(exprText);
+      const code = node.compile();
+      return function (x) {
+        return code.evaluate({ x: x });
+      };
+    }
+
+    function buildDerivative(exprText) {
+      const dNode = math.derivative(exprText, "x");
+      const code = dNode.compile();
+      return function (x) {
+        return code.evaluate({ x: x });
+      };
+    }
+
+    function bisectionMethod(f, a, b, tol, maxIter) {
+      const iters = [];
+      let fa = f(a);
+      let fb = f(b);
+      if (fa * fb > 0) {
+        return [];
+      }
+      for (let n = 0; n < maxIter; n++) {
+        const m = 0.5 * (a + b);
+        const fm = f(m);
+        iters.push({ n, a, b, m, fa, fb, fm });
+        if (Math.abs(fm) <= tol || Math.abs(b - a) / 2 <= tol) break;
+        if (fa * fm < 0) {
+          b = m;
+          fb = fm;
+        } else {
+          a = m;
+          fa = fm;
+        }
+      }
+      return iters;
+    }
+
+    function newtonMethod(f, df, x0, tol, maxIter) {
+      const iters = [];
+      let x = x0;
+      for (let n = 0; n < maxIter; n++) {
+        const fx = f(x);
+        const dfx = df(x);
+        iters.push({ n, x, fx, dfx });
+        if (Math.abs(fx) <= tol) break;
+        const x1 = x - fx / dfx;
+        if (!isFinite(x1)) {
+          break;
+        }
+        x = x1;
+      }
+      return iters;
+    }
+
+    function secantMethod(f, x0, x1, tol, maxIter) {
+      const iters = [];
+      let xPrev = x0;
+      let xCurr = x1;
+      iters.push({ n: 0, x: xPrev, fx: f(xPrev) });
+      iters.push({ n: 1, x: xCurr, fx: f(xCurr) });
+      for (let n = 2; n < maxIter; n++) {
+        const fPrev = f(xPrev);
+        const fCurr = f(xCurr);
+        if (fCurr - fPrev === 0) {
+          break;
+        }
+        const xNext = xCurr - fCurr * (xCurr - xPrev) / (fCurr - fPrev);
+        const fxNext = f(xNext);
+        iters.push({ n, x: xNext, fx: fxNext });
+        if (Math.abs(fxNext) <= tol) break;
+        xPrev = xCurr;
+        xCurr = xNext;
+      }
+      return iters;
+    }
+
+    function findRootBrackets(f, xmin, xmax, steps) {
+      const brackets = [];
+      if (!isFinite(xmin) || !isFinite(xmax) || xmin === xmax) return brackets;
+      if (xmin > xmax) {
+        const t = xmin;
+        xmin = xmax;
+        xmax = t;
+      }
+      const h = (xmax - xmin) / steps;
+      let x0 = xmin;
+      let f0 = f(x0);
+      for (let i = 1; i <= steps; i++) {
+        const x1 = xmin + i * h;
+        const f1 = f(x1);
+        if (!isFinite(f0) || !isFinite(f1)) {
+          x0 = x1;
+          f0 = f1;
+          continue;
+        }
+        if (f0 * f1 < 0) {
+          brackets.push({ a: x0, b: x1 });
+        }
+        x0 = x1;
+        f0 = f1;
+      }
+      return brackets;
+    }
+
+    function renderBisectionTable(iters) {
+      if (iters.length === 0) return "";
+      let html = "<table><thead><tr>";
+      html += "<th>n</th><th>a</th><th>b</th><th>m</th><th>f(a)</th><th>f(b)</th><th>f(m)</th>";
+      html += "</tr></thead><tbody>";
+      iters.forEach(row => {
+        html += "<tr>";
+        html += `<td>${row.n}</td>`;
+        html += `<td>${row.a.toFixed(10)}</td>`;
+        html += `<td>${row.b.toFixed(10)}</td>`;
+        html += `<td>${row.m.toFixed(10)}</td>`;
+        html += `<td>${row.fa.toExponential(3)}</td>`;
+        html += `<td>${row.fb.toExponential(3)}</td>`;
+        html += `<td>${row.fm.toExponential(3)}</td>`;
+        html += "</tr>";
+      });
+      html += "</tbody></table>";
+      return html;
+    }
+
+    function renderNewtonTable(iters) {
+      if (iters.length === 0) return "";
+      let html = "<table><thead><tr>";
+      html += "<th>n</th><th>x_n</th><th>f(x_n)</th><th>f'(x_n)</th>";
+      html += "</tr></thead><tbody>";
+      iters.forEach(row => {
+        html += "<tr>";
+        html += `<td>${row.n}</td>`;
+        html += `<td>${row.x.toFixed(10)}</td>`;
+        html += `<td>${row.fx.toExponential(3)}</td>`;
+        html += `<td>${row.dfx.toExponential(3)}</td>`;
+        html += "</tr>";
+      });
+      html += "</tbody></table>";
+      return html;
+    }
+
+    function renderSecantTable(iters) {
+      if (iters.length === 0) return "";
+      let html = "<table><thead><tr>";
+      html += "<th>n</th><th>x_n</th><th>f(x_n)</th>";
+      html += "</tr></thead><tbody>";
+      iters.forEach(row => {
+        html += "<tr>";
+        html += `<td>${row.n}</td>`;
+        html += `<td>${row.x.toFixed(10)}</td>`;
+        html += `<td>${row.fx.toExponential(3)}</td>`;
+        html += "</tr>";
+      });
+      html += "</tbody></table>";
+      return html;
+    }
+
+    function renderRootSummary(roots) {
+      const container = document.getElementById("rootSummary");
+      if (!roots || roots.length === 0) {
+        container.innerHTML = "<div class='helper'>No se detectaron raices en el intervalo dado.</div>";
+        return;
+      }
+      let html = "<div class='root-summary-header'>Raices aproximadas:</div>";
+      html += "<div class='root-list'>";
+      roots.forEach((r, index) => {
+        html += `<div class="root-chip">`;
+        html += `<div class="root-chip-label">x${index + 1}</div>`;
+        html += `<div class="root-chip-value">≈ ${r.value.toFixed(10)}</div>`;
+        html += `<div class="root-chip-fx">f(x) = ${r.fx.toExponential(3)}</div>`;
+        html += "</div>";
+      });
+      html += "</div>";
+      container.innerHTML = html;
+    }
+
+    function renderAllTables(method, tables) {
+      const container = document.getElementById("tableContainer");
+      if (!tables || tables.length === 0) {
+        container.innerHTML = "";
+        return;
+      }
+      let html = "";
+      tables.forEach((entry, idx) => {
+        const num = idx + 1;
+        const a = entry.bracket.a.toFixed(4);
+        const b = entry.bracket.b.toFixed(4);
+        html += `<div class="root-table-title">Raiz x${num} (intervalo aprox. [${a}, ${b}])</div>`;
+        if (method === "bisection") {
+          html += renderBisectionTable(entry.iters);
+        } else if (method === "newton") {
+          html += renderNewtonTable(entry.iters);
+        } else if (method === "secant") {
+          html += renderSecantTable(entry.iters);
+        }
+      });
+      container.innerHTML = html;
+    }
+
+    function runMethod() {
+      const exprText = document.getElementById("fnInput").value.trim();
+      if (!exprText) {
+        alert("Ingresa una funcion primero.");
+        return;
+      }
+      const method = document.getElementById("methodSelect").value;
+      let xmin = parseFloat(document.getElementById("xminInput").value);
+      let xmax = parseFloat(document.getElementById("xmaxInput").value);
+      const tol = parseFloat(document.getElementById("tolInput").value);
+      const maxIter = parseInt(document.getElementById("maxIterInput").value, 10);
+
+      let f;
+      try {
+        f = buildFunction(exprText);
+      } catch (err) {
+        alert("Error al interpretar la funcion. Revisa la sintaxis.");
+        return;
+      }
+
+      if (!isFinite(xmin) || !isFinite(xmax) || xmin === xmax) {
+        xmin = -5;
+        xmax = 5;
+      }
+      if (xmin > xmax) {
+        const t = xmin;
+        xmin = xmax;
+        xmax = t;
+      }
+
+      let df = null;
+      if (method === "newton") {
+        try {
+          df = buildDerivative(exprText);
+        } catch (err) {
+          alert("No se pudo derivar la funcion. Revisa la sintaxis.");
+          return;
+        }
+      }
+
+      const brackets = findRootBrackets(f, xmin, xmax, 240);
+      if (brackets.length === 0) {
+        renderRootSummary([]);
+        renderAllTables(method, []);
+        document.getElementById("result").textContent =
+          "No se encontraron raices en el intervalo [" + xmin + ", " + xmax + "].";
+        return;
+      }
+
+      const tables = [];
+      const roots = [];
+
+      brackets.forEach(br => {
+        let iters = [];
+        let rootVal = null;
+        if (method === "bisection") {
+          iters = bisectionMethod(f, br.a, br.b, tol, maxIter);
+          if (iters.length > 0) {
+            const last = iters[iters.length - 1];
+            rootVal = last.m;
+          }
+        } else if (method === "newton") {
+          const x0 = 0.5 * (br.a + br.b);
+          iters = newtonMethod(f, df, x0, tol, maxIter);
+          if (iters.length > 0) {
+            const last = iters[iters.length - 1];
+            rootVal = last.x;
+          }
+        } else if (method === "secant") {
+          iters = secantMethod(f, br.a, br.b, tol, maxIter);
+          if (iters.length > 0) {
+            const last = iters[iters.length - 1];
+            rootVal = last.x;
+          }
+        }
+        if (iters.length > 0 && rootVal != null && isFinite(rootVal)) {
+          tables.push({ bracket: br, iters: iters });
+          roots.push({ value: rootVal, fx: f(rootVal) });
+        }
+      });
+
+      renderRootSummary(roots);
+      renderAllTables(method, tables);
+
+      document.getElementById("result").textContent =
+        "Metodo: " + method + " | raices con tabla generada: " + roots.length +
+        " en el intervalo [" + xmin + ", " + xmax + "].";
+    }
+
+    document.getElementById("runBtn").addEventListener("click", runMethod);
+  </script>
+</body>
+</html>
